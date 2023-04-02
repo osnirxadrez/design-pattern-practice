@@ -7,6 +7,7 @@ import br.osnircompany.desingpatternpractice.service.GeoDBCitiesService;
 import br.osnircompany.desingpatternpractice.service.LocalizacaoService;
 import br.osnircompany.desingpatternpractice.service.WeatherApiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,6 +20,8 @@ public class LocalizacaoServiceImpl implements LocalizacaoService {
     CidadeRepository cidadeRepository;
     @Autowired
     WeatherApiService weatherApiService;
+    @Value("${X-RapidAPI-Key}")
+    String apiKey;
 
     @Override
     public Iterable<Cidade> getCidadeByNome (String nome) {
@@ -27,7 +30,7 @@ public class LocalizacaoServiceImpl implements LocalizacaoService {
             return cidades;
         }
         Map<String,Object> headerMap = new HashMap<>();
-        headerMap.put("X-RapidAPI-Key", "a796ced7a8msh75a87dbec7c30fdp1e60cejsn71b7880a8eaf");
+        headerMap.put("X-RapidAPI-Key", apiKey);
         headerMap.put("X-RapidAPI-Host", "wft-geo-db.p.rapidapi.com");
 
         return cidadeRepository.saveAll(geoDBCitiesService.getCidadesByNome(headerMap, nome).getData());
@@ -39,10 +42,8 @@ public class LocalizacaoServiceImpl implements LocalizacaoService {
         if (cidade != null) {
             return cidade;
         }
-
         Map<String,Object> headerMap = new HashMap<>();
-
-        headerMap.put("X-RapidAPI-Key", "a796ced7a8msh75a87dbec7c30fdp1e60cejsn71b7880a8eaf");
+        headerMap.put("X-RapidAPI-Key", apiKey);
         headerMap.put("X-RapidAPI-Host", "wft-geo-db.p.rapidapi.com");
         return cidadeRepository.save(geoDBCitiesService.getCidadesById(headerMap, id).getData());
     }
@@ -50,10 +51,8 @@ public class LocalizacaoServiceImpl implements LocalizacaoService {
     public Forecast getPrevisaoPorCidade (Integer id) {
         Cidade cidade = getCidadeById(id);
         Map<String,Object> headerMap = new HashMap<>();
-
-        headerMap.put("X-RapidAPI-Key", "a796ced7a8msh75a87dbec7c30fdp1e60cejsn71b7880a8eaf");
+        headerMap.put("X-RapidAPI-Key", apiKey);
         headerMap.put("X-RapidAPI-Host", "weatherapi-com.p.rapidapi.com");
-
         return weatherApiService.getPrevisaoPorLocalizacao(headerMap, cidade.getLatitude()+","+cidade.getLongitude()).getForecast();
     }
 }
